@@ -287,3 +287,36 @@ spec:
       - configMap:
           name: permission-bot-config
         name: permission-bot-config
+---
+apiVersion: v1
+data:
+  config.json: "{\r\n  \"mode\": \"authoritative\",\r\n  \"groups\": [\r\n    {\r\n
+    \     \"prefix\": \"example\",\r\n      \"label\": \"example\",\r\n      \"roles\":
+    {\r\n        \"edit\": [\r\n          {\"type\": \"User\", \"name\": \"editor@example.com\"}\r\n
+    \       ],\r\n        \"admin\": [\r\n          {\"type\": \"User\", \"name\":
+    \"admin@example.com\"}\r\n        ],\r\n        \"view\": [\r\n          {\"type\":
+    \"User\", \"name\": \"viewer@example.com\"}\r\n        ]\r\n      }\r\n    },\r\n
+    \   {\r\n      \"prefix\": \"example2\",\r\n      \"label\": \"example2\",\r\n
+    \     \"roles\": {\r\n        \"edit\": [\r\n          {\"type\": \"User\", \"name\":
+    \"editor@example2.com\"}\r\n        ],\r\n        \"admin\": [\r\n          {\"type\":
+    \"User\", \"name\": \"admin@example2.com\"}\r\n        ],\r\n        \"view\":
+    [\r\n          {\"type\": \"User\", \"name\": \"viewer@example2.com\"}\r\n        ]\r\n
+    \     }\r\n    }\r\n  ]\r\n}\r\n"
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2021-01-03T21:46:31Z"
+  managedFields:
+  - apiVersion: v1
+    fieldsType: FieldsV1
+    fieldsV1:
+      f:data:
+        .: {}
+        f:config.json: {}
+    manager: kubectl-create
+    operation: Update
+    time: "2021-01-03T21:46:31Z"
+  name: permission-bot-config
+  namespace: namespace-permission-bot-system
+  resourceVersion: "540450"
+  selfLink: /api/v1/namespaces/namespace-permission-bot-system/configmaps/permission-bot-config
+  uid: fa8edec8-7b7a-4435-be84-142318f44d9b

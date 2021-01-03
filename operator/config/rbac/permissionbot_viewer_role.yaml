@@ -1,0 +1,20 @@
+# permissions for end users to view permissionbots.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: permissionbot-viewer-role
+rules:
+- apiGroups:
+  - permission-bot.mrriptide.github.io
+  resources:
+  - permissionbots
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - permission-bot.mrriptide.github.io
+  resources:
+  - permissionbots/status
+  verbs:
+  - get

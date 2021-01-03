@@ -1,0 +1,7 @@
+apiVersion: permission-bot.mrriptide.github.io/v1alpha1
+kind: PermissionBot
+metadata:
+  name: permissionbot-sample
+spec:
+  # Add fields here
+  foo: bar

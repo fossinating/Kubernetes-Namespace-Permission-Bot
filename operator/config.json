@@ -1,0 +1,20 @@
+{
+  "mode": "authoritative",
+  "groups": [
+    {
+      "prefix": "example",
+      "label": "example",
+      "roles": {
+        "admin": [
+          {"type": "User", "name": "lead@example.com"}
+        ],
+        "edit": [
+          {"type": "User", "name": "dev@example.com"}
+        ],
+        "view": [
+          {"type": "User", "name": "viewer@example.com"}
+        ]
+      }
+    }
+  ]
+}

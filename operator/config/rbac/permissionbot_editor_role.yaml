@@ -1,0 +1,24 @@
+# permissions for end users to edit permissionbots.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: permissionbot-editor-role
+rules:
+- apiGroups:
+  - permission-bot.mrriptide.github.io
+  resources:
+  - permissionbots
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - permission-bot.mrriptide.github.io
+  resources:
+  - permissionbots/status
+  verbs:
+  - get

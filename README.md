@@ -12,6 +12,8 @@ Once you have the deployment yaml, apply it into your kubernetes cluster using
 kubectl apply -f deploy.yaml
 ```
 
+*Note: If you are planning on using roles other than `admin` `edit` and `view`, make sure to create a ClusterRoleBinding that gives the operator's service account the role so that it can give those permissions.*
+
 ## Configuration
 
 In order to configure this operator to your liking, you must edit the configmap. The easiest way of doing this is through editing a `config.json` file and then using that to provide the configmap with configuration

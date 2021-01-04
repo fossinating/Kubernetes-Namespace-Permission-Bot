@@ -146,6 +146,30 @@ rules:
   - create
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: namespace-permission-bot-namespace-role
+rules:
+- apiGroups:
+  - ""
+  - rbac.authorization.k8s.io
+  resources:
+  - namespaces
+  verbs:
+  - get
+  - watch
+  - list
+- apiGroups:
+  - ""
+  - rbac.authorization.k8s.io
+  resources:
+  - rolebindings
+  verbs:
+  - get
+  - create
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: namespace-permission-bot-leader-election-rolebinding
@@ -180,6 +204,58 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: namespace-permission-bot-proxy-role
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: namespace-permission-bot-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: namespace-permission-bot-namespace-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: namespace-permission-bot-namespace-role
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: namespace-permission-bot-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: namespace-permission-bot-admin-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: admin
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: namespace-permission-bot-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: namespace-permission-bot-edit-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: edit
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: namespace-permission-bot-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: namespace-permission-bot-view-rolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
 subjects:
 - kind: ServiceAccount
   name: default
@@ -253,7 +329,7 @@ spec:
         - --leader-elect
         command:
         - /manager
-        image: quay.io/mrriptide/permission-bot:v0.0.1
+        image: quay.io/mrriptide/permission-bot:latest
         livenessProbe:
           httpGet:
             path: /healthz
@@ -304,19 +380,5 @@ data:
     \     }\r\n    }\r\n  ]\r\n}\r\n"
 kind: ConfigMap
 metadata:
-  creationTimestamp: "2021-01-03T21:46:31Z"
-  managedFields:
-  - apiVersion: v1
-    fieldsType: FieldsV1
-    fieldsV1:
-      f:data:
-        .: {}
-        f:config.json: {}
-    manager: kubectl-create
-    operation: Update
-    time: "2021-01-03T21:46:31Z"
   name: permission-bot-config
   namespace: namespace-permission-bot-system
-  resourceVersion: "540450"
-  selfLink: /api/v1/namespaces/namespace-permission-bot-system/configmaps/permission-bot-config
-  uid: fa8edec8-7b7a-4435-be84-142318f44d9b

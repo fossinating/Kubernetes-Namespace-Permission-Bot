@@ -82,9 +82,10 @@ type Group struct {
 }
 
 type Conf struct {
-	Mode     string  `json:"mode"`
-	LabelKey string  `json:"label_key"`
-	Groups   []Group `json:"groups"`
+	Mode      string  `json:"mode"`
+	LabelKey  string  `json:"label_key,omitempty"`
+	Delimiter string  `json:"delimiter"`
+	Groups    []Group `json:"groups"`
 }
 
 // +kubebuilder:rbac:groups=permission-bot.mrriptide.github.io,resources=permissionbots,verbs=get;list;watch;create;update;patch;delete
@@ -272,18 +273,18 @@ func NamespaceContainsRolebinding(existing []rbacv1.RoleBinding, role_binding_na
 	return false
 }
 
-func CreateRoleBinding(ctx context.Context, log logr.Logger, mode string, existing *rbacv1.RoleBindingList, namespace_name string, clientset kubernetes.Interface, role string, targets []Subject) error {
+func CreateRoleBinding(ctx context.Context, log logr.Logger, mode string, existing *rbacv1.RoleBindingList, namespace_name string, clientset kubernetes.Interface, group_name string, role string, targets []Subject) error {
 	// Set the name of the rolebinding
 
 	meta := metav1.ObjectMeta{
-		Name:      role + "-" + namespace_name + "-auto-permission",
+		Name:      role + "-" + group_name + "-auto-permission",
 		Namespace: namespace_name,
 	}
 
 	// Get the role reference
 
 	role_ref := rbacv1.RoleRef{
-		Kind:     "Role",
+		Kind:     "ClusterRole",
 		Name:     role,
 		APIGroup: "rbac.authorization.k8s.io",
 	}
@@ -308,18 +309,18 @@ func CreateRoleBinding(ctx context.Context, log logr.Logger, mode string, existi
 
 	// Check if rolebinding exists in namespace already and if it does, update instead of create
 
-	if NamespaceContainsRolebinding(existing.Items, role+"-"+namespace_name+"-auto-permission") {
+	if NamespaceContainsRolebinding(existing.Items, role+"-"+group_name+"-auto-permission") {
 		if mode == "authoritative" {
-			log.Info("Rolebinding \"" + role + "-" + namespace_name + "-auto-permission" + "\" already exists in namespace, updating it now")
+			log.Info("Rolebinding \"" + role + "-" + group_name + "-auto-permission" + "\" already exists in namespace, updating it now")
 
 			_, err := clientset.RbacV1().RoleBindings(namespace_name).Update(ctx, &binding, metav1.UpdateOptions{})
 			if err != nil {
 				return err
 			}
 		} else if mode == "passive" {
-			log.Info("Rolebinding \"" + role + "-" + namespace_name + "-auto-permission" + "\" already exists in namespace, ignoring it since on passive mode")
+			log.Info("Rolebinding \"" + role + "-" + group_name + "-auto-permission" + "\" already exists in namespace, ignoring it since on passive mode")
 		} else {
-			log.Info("Rolebinding \"" + role + "-" + namespace_name + "-auto-permission" + "\" already exists in namespace, ignoring it since on unknown \"" + mode + "\" mode")
+			log.Info("Rolebinding \"" + role + "-" + group_name + "-auto-permission" + "\" already exists in namespace, ignoring it since on unknown \"" + mode + "\" mode")
 		}
 
 	} else {
@@ -431,11 +432,11 @@ func ReconcileNamespace(log logr.Logger, ctx context.Context, kube_config *rest.
 			label = namespace.ObjectMeta.Labels[group.LabelKey]
 		}
 		// Check if prefix or label value matchesg
-		if (strings.HasPrefix(namespace.ObjectMeta.Name, group.Prefix) && group.Prefix != "") || (group.Label == label && group.Label != "") {
+		if (strings.HasPrefix(namespace.ObjectMeta.Name, group.Prefix+config.Delimiter) && group.Prefix != "") || (group.Label == label && group.Label != "") {
 			log.Info("Namespace has group rules defined")
 
 			for role, target := range group.Roles {
-				err = CreateRoleBinding(ctx, log, config.Mode, existing, namespace.ObjectMeta.Name, clientset, role, target)
+				err = CreateRoleBinding(ctx, log, config.Mode, existing, namespace.ObjectMeta.Name, clientset, group.Prefix, role, target)
 				if err != nil {
 					log.Error(err, "Failed to create rolebinding \""+role+"\"")
 					return err

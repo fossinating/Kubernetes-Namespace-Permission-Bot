@@ -1,5 +1,6 @@
 {
   "mode": "authoritative",
+  "delimiter": "-",
   "groups": [
     {
       "prefix": "example",

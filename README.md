@@ -18,6 +18,22 @@ kubectl apply -f deploy.yaml
 
 In order to configure this operator to your liking, you must edit the configmap. The easiest way of doing this is through editing a `config.json` file and then using that to provide the configmap with configuration
 
+### Components of the config file
+
+`mode`: Sets the mode of the operator. `authoritative` makes it update the rolebindings on each event call, while `passive` will only set the rolebindings on namespace creation(Default: `authoritative`)
+`delimiter`: Defines the delimiter used in namespaces for use in detecting the prefix. Can be set to `""` to not require a specific delimiter(Default: `"-"`)
+`label_key`: Defines the global key to be used when checking labels to determine the group(Default: `"group"`)
+`groups`: Slice of groups to be used when creating rolebindings
+- `prefix`: Defines the prefix that will cause this group's roles to be applied to a namespace
+- `label`: Defines the label value that will cause this group's roles to be applied to a namespace
+- `label_key`: Defines the label to be used when checking labels for this group only. Will override the global setting
+- `roles`: Map of the roles and subjects to be created into a rolebinding. The key is the ClusterRole that will be used and the value is a slice of subjects to apply the RoleBinding to.
+  - `type`: The type of the subject, can be `User`, `ServiceAccount`, or `Group`
+  - `name`: The name of the subject
+
+
+### Applying changes
+
 Once you've edited `config.json` to your liking, you can update the configmap with 
 
 ```bash
